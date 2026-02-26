@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍼 Baby Gender Reveal Lotto</title>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Jua&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pastel-pink: #FFD1DC;
+  --pastel-blue: #B5D8F7;
+  --pastel-yellow: #FFF5BA;
+  --pastel-mint: #B8F0D8;
+  --pastel-lavender: #E8D5F5;
+  --pastel-peach: #FFDAB9;
+  --cream: #FFF9F0;
+  --gold: #E8C547;
+  --text: #6B5B73;
+  --text-light: #9B8BA3;
+  --scratch-cover: linear-gradient(135deg, #C5B8D0 0%, #9B8BA3 50%, #C5B8D0 100%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Gaegu', cursive;
+  background: var(--cream);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: var(--text);
+  position: relative;
+}
+
+/* Floating background decorations */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(255,209,220,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(181,216,247,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(232,213,245,0.2) 0%, transparent 60%);
+  z-index: 0;
+  animation: bgFloat 20s ease-in-out infinite;
+}
+
+@keyframes bgFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, 1%) rotate(1deg); }
+  66% { transform: translate(-1%, 2%) rotate(-1deg); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+/* ===== SETUP SCREEN ===== */
+.setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90dvh;
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+}
+
+.setup-screen h1 {
+  font-family: 'Jua', sans-serif;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.setup-screen p {
+  font-size: 18px;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.setup-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.gender-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.gender-btn {
+  width: 140px;
+  height: 140px;
+  border: 3px solid transparent;
+  border-radius: 24px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Jua', sans-serif;
+  font-size: 18px;
+  color: var(--text);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+
+.gender-btn:active { transform: scale(0.95); }
+
+.gender-btn .emoji { font-size: 48px; }
+
+.gender-btn.selected-boy {
+  border-color: var(--pastel-blue);
+  background: linear-gradient(135deg, #E8F4FF, #B5D8F7);
+  box-shadow: 0 4px 24px rgba(181,216,247,0.5);
+}
+
+.gender-btn.selected-girl {
+  border-color: var(--pastel-pink);
+  background: linear-gradient(135deg, #FFF0F3, #FFD1DC);
+  box-shadow: 0 4px 24px rgba(255,209,220,0.5);
+}
+
+.start-btn {
+  width: 100%;
+  max-width: 300px;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--pastel-lavender), var(--pastel-pink));
+  color: var(--text);
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(232,213,245,0.5);
+  transition: all 0.3s ease;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.start-btn.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.start-btn.active:active { transform: scale(0.96); }
+
+/* ===== GAME SCREEN ===== */
+.game-screen {
+  display: none;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.game-title {
+  font-family: 'Jua', sans-serif;
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.game-subtitle {
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+/* Lotto ticket card */
+.lotto-ticket {
+  background: white;
+  border-radius: 24px;
+  padding: 24px 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.lotto-ticket::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, 
+    var(--pastel-pink), var(--pastel-blue), var(--pastel-yellow), 
+    var(--pastel-mint), var(--pastel-lavender), var(--pastel-peach));
+}
+
+.ticket-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px dashed #F0E8F5;
+}
+
+.ticket-logo {
+  font-size: 36px;
+  margin-bottom: 4px;
+}
+
+.ticket-name {
+  font-family: 'Jua', sans-serif;
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: 2px;
+}
+
+.ticket-sub {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Scratch grid */
+.scratch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.scratch-cell {
+  aspect-ratio: 1;
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.scratch-cell:active { transform: scale(0.95); }
+
+/* The revealed content underneath */
+.scratch-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.scratch-emoji {
+  font-size: 32px;
+  margin-bottom: 2px;
+}
+
+.scratch-text {
+  font-family: 'Jua', sans-serif;
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Scratch cover overlay */
+.scratch-cover {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--scratch-cover);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  z-index: 2;
+}
+
+.scratch-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(255,255,255,0.08) 4px,
+    rgba(255,255,255,0.08) 8px
+  );
+  border-radius: 16px;
+}
+
+.scratch-number {
+  font-family: 'Jua', sans-serif;
+  font-size: 28px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.scratch-cover.scratching {
+  animation: scratchAway 0.6s ease forwards;
+}
+
+@keyframes scratchAway {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(0.8); pointer-events: none; }
+}
+
+.scratch-cell.revealed .scratch-cover { display: none; }
+
+.scratch-cell.revealed .scratch-content {
+  animation: revealPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes revealPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Locked cells */
+.scratch-cell.locked .scratch-cover {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scratch-cell.locked .scratch-cover::after {
+  content: '🔒';
+  position: absolute;
+  font-size: 16px;
+  bottom: 6px;
+  right: 6px;
+}
+
+/* Progress */
+.progress-area {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 2px dashed #F0E8F5;
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #F0E8F5;
+  transition: all 0.3s ease;
+}
+
+.progress-dot.filled {
+  background: var(--pastel-lavender);
+  box-shadow: 0 0 8px rgba(232,213,245,0.6);
+  transform: scale(1.1);
+}
+
+.progress-text {
+  font-size: 15px;
+  color: var(--text-light);
+}
+
+/* ===== FINAL REVEAL ===== */
+.reveal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.reveal-overlay.show {
+  display: flex;
+}
+
+.reveal-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.reveal-bg.boy-bg {
+  background: linear-gradient(135deg, #E8F4FF 0%, #B5D8F7 40%, #87CEEB 100%);
+}
+
+.reveal-bg.girl-bg {
+  background: linear-gradient(135deg, #FFF0F3 0%, #FFD1DC 40%, #FFB6C1 100%);
+}
+
+.reveal-card {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 24px;
+  animation: revealBounce 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes revealBounce {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.reveal-emoji {
+  font-size: 100px;
+  margin-bottom: 16px;
+  animation: revealPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes revealPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.reveal-text {
+  font-family: 'Jua', sans-serif;
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.reveal-text.boy-text { color: #4A90D9; }
+.reveal-text.girl-text { color: #E8789A; }
+
+.reveal-sub {
+  font-family: 'Jua', sans-serif;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 32px;
+}
+
+.reveal-congrats {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+/* Confetti particles */
+.confetti-container {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 101;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  top: -20px;
+  animation: confettiFall linear forwards;
+}
+
+.confetti-piece {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.confetti-star {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.confetti-streamer {
+  width: 8px;
+  height: 24px;
+  border-radius: 4px;
+}
+
+.confetti-circle {
+  border-radius: 50%;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(110dvh) rotate(1080deg) scale(0.5); opacity: 0; }
+}
+
+@keyframes confettiSway {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+  25% { transform: translateY(28dvh) translateX(30px) rotate(270deg); }
+  50% { transform: translateY(55dvh) translateX(-20px) rotate(540deg); opacity: 1; }
+  75% { transform: translateY(83dvh) translateX(40px) rotate(810deg); }
+  100% { transform: translateY(110dvh) translateX(0) rotate(1080deg); opacity: 0; }
+}
+
+@keyframes confettiBurst {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  10% { transform: translateY(-20px) scale(1.5); opacity: 1; }
+  100% { transform: translateY(110dvh) scale(0.3); opacity: 0; }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
+}
+
+/* Reset button */
+.reset-btn {
+  padding: 14px 40px;
+  border: 2px solid rgba(255,255,255,0.6);
+  border-radius: 50px;
+  background: rgba(255,255,255,0.3);
+  backdrop-filter: blur(4px);
+  color: var(--text);
+  font-family: 'Jua', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.5); }
+
+/* Floating baby items animation */
+.floating-items {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.float-item {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.15;
+  animation: floatAround linear infinite;
+}
+
+@keyframes floatAround {
+  0% { transform: translateY(100dvh) rotate(0deg); }
+  100% { transform: translateY(-100px) rotate(360deg); }
+}
+
+/* Hint colors */
+.hint-bg-1 { background: linear-gradient(135deg, #FFF5BA, #FFECB3); }
+.hint-bg-2 { background: linear-gradient(135deg, #B8F0D8, #A8E6CF); }
+.hint-bg-3 { background: linear-gradient(135deg, #E8D5F5, #D5B8F0); }
+.hint-bg-4 { background: linear-gradient(135deg, #FFDAB9, #FFD1A9); }
+.hint-bg-5 { background: linear-gradient(135deg, #B5D8F7, #A5CDE8); }
+.final-bg-boy { background: linear-gradient(135deg, #B5D8F7, #87CEEB); }
+.final-bg-girl { background: linear-gradient(135deg, #FFD1DC, #FFB6C1); }
+.hint-text-1 { color: #8B7B2A; }
+.hint-text-2 { color: #3B7A5A; }
+.hint-text-3 { color: #6B4A8A; }
+.hint-text-4 { color: #8B6A3A; }
+.hint-text-5 { color: #3A6A8B; }
+
+/* Admin panel (hidden gender setting) */
+.admin-panel {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-panel.show { display: flex; }
+
+.admin-content {
+  background: white;
+  border-radius: 24px;
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  animation: revealPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  max-width: 340px;
+  width: 90%;
+}
+
+.admin-close-btn {
+  margin-top: 20px;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--pastel-mint), #A8E6CF);
+  color: var(--text);
+  font-family: 'Jua', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(184,240,216,0.5);
+  transition: all 0.3s ease;
+}
+
+.admin-close-btn:active { transform: scale(0.95); }
+
+.secret-tap-zone {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 5;
+  border-radius: 50%;
+}
+
+/* Shake animation for locked cells */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.scratch-cell.shake {
+  animation: shake 0.4s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- Floating background items -->
+<div class="floating-items" id="floatingItems"></div>
+
+<div class="container">
+  <!-- SETUP SCREEN -->
+  <div class="setup-screen" id="setupScreen">
+    <div class="setup-icon">🎰</div>
+    <h1>Baby Lotto</h1>
+    <p>우리 열매의 성별은? 🍼</p>
+    <p style="font-size:15px; color:var(--text-light); margin-top:-20px; margin-bottom:32px;">번호를 긁어서 확인해보세요!</p>
+    
+    <button class="start-btn active" id="startBtn" onclick="startGame()">
+      🎫 게임 시작하기
+    </button>
+  </div>
+
+  <!-- HIDDEN GENDER SETUP (accessed via secret tap) -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-content">
+      <h2 style="font-family:'Jua',sans-serif; font-size:22px; color:var(--text); margin-bottom:8px;">🔒 성별 설정 (비밀!)</h2>
+      <p style="font-size:14px; color:var(--text-light); margin-bottom:20px;">게임에 사용할 성별을 선택하세요</p>
+      <div class="gender-buttons">
+        <button class="gender-btn" id="btnBoy" onclick="selectGender('boy')">
+          <span class="emoji">👶💙</span>
+          Boy
+        </button>
+        <button class="gender-btn" id="btnGirl" onclick="selectGender('girl')">
+          <span class="emoji">👶💗</span>
+          Girl
+        </button>
+      </div>
+      <button class="admin-close-btn" onclick="closeAdmin()">✓ 설정 완료</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="game-screen" id="gameScreen">
+    <div class="game-header">
+      <div class="game-title">🍼 Baby Lotto 🎰</div>
+      <div class="game-subtitle">번호를 터치해서 긁어보세요!</div>
+    </div>
+
+    <div class="lotto-ticket">
+      <div class="ticket-header">
+        <div class="ticket-logo">🎫</div>
+        <div class="ticket-name">GENDER REVEAL</div>
+        <div class="ticket-sub">행운의 번호를 긁어보세요</div>
+      </div>
+
+      <div class="scratch-grid" id="scratchGrid">
+        <!-- Generated by JS -->
+      </div>
+
+      <div class="progress-area">
+        <div class="progress-dots" id="progressDots">
+          <!-- Generated by JS -->
+        </div>
+        <div class="progress-text" id="progressText">순서대로 긁어보세요! 🐣</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVEAL OVERLAY -->
+<div class="reveal-overlay" id="revealOverlay">
+  <div class="reveal-bg" id="revealBg"></div>
+  <div class="reveal-card" id="revealCard">
+    <div class="reveal-emoji" id="revealEmoji"></div>
+    <div class="reveal-text" id="revealText"></div>
+    <div class="reveal-sub">우리 열매는...</div>
+    <div class="reveal-congrats">🎉 축하합니다! 🎉</div>
+    <button class="reset-btn" onclick="resetGame()">🔄 다시 하기</button>
+  </div>
+</div>
+
+<!-- CONFETTI -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+let selectedGender = null;
+let currentStep = 0;
+let totalSteps = 6;
+let isAnimating = false;
+let secretTapCount = 0;
+let secretTapTimer = null;
+
+// Hint data for each cell
+const hints = {
+  boy: [
+    { emoji: '👣', text: '작은 발자국', bg: 'hint-bg-1', textColor: 'hint-text-1' },
+    { emoji: '🧸', text: '곰돌이 인형', bg: 'hint-bg-2', textColor: 'hint-text-2' },
+    { emoji: '⭐', text: '반짝이는 별', bg: 'hint-bg-3', textColor: 'hint-text-3' },
+    { emoji: '🍼', text: '젖병 준비!', bg: 'hint-bg-4', textColor: 'hint-text-4' },
+    { emoji: '🧢', text: '작은 모자', bg: 'hint-bg-5', textColor: 'hint-text-5' },
+    { emoji: '👶💙', text: "It's a BOY!", bg: 'final-bg-boy', textColor: '' }
+  ],
+  girl: [
+    { emoji: '👣', text: '작은 발자국', bg: 'hint-bg-1', textColor: 'hint-text-1' },
+    { emoji: '🧸', text: '곰돌이 인형', bg: 'hint-bg-2', textColor: 'hint-text-2' },
+    { emoji: '⭐', text: '반짝이는 별', bg: 'hint-bg-3', textColor: 'hint-text-3' },
+    { emoji: '🍼', text: '젖병 준비!', bg: 'hint-bg-4', textColor: 'hint-text-4' },
+    { emoji: '🎀', text: '리본 하나', bg: 'hint-bg-5', textColor: 'hint-text-5' },
+    { emoji: '👶💗', text: "It's a GIRL!", bg: 'final-bg-girl', textColor: '' }
+  ]
+};
+
+const progressMessages = [
+  '순서대로 긁어보세요! 🐣',
+  '첫 번째 힌트! 두근두근 💓',
+  '점점 가까워지고 있어요! 🔍',
+  '벌써 반이나! 기대되죠? ✨',
+  '거의 다 왔어요! 😆',
+  '마지막 하나! 두구두구... 🥁',
+  '🎉🎉🎉'
+];
+
+// Secret admin: tap title 5 times quickly to open gender setting
+function handleSecretTap() {
+  secretTapCount++;
+  clearTimeout(secretTapTimer);
+  secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 1500);
+  
+  if (secretTapCount >= 5) {
+    secretTapCount = 0;
+    document.getElementById('adminPanel').classList.add('show');
+  }
+}
+
+function selectGender(gender) {
+  selectedGender = gender;
+  document.getElementById('btnBoy').className = 'gender-btn' + (gender === 'boy' ? ' selected-boy' : '');
+  document.getElementById('btnGirl').className = 'gender-btn' + (gender === 'girl' ? ' selected-girl' : '');
+}
+
+function closeAdmin() {
+  document.getElementById('adminPanel').classList.remove('show');
+}
+
+function startGame() {
+  // If no gender set yet via secret panel, randomly pick one
+  if (!selectedGender) {
+    selectedGender = Math.random() < 0.5 ? 'boy' : 'girl';
+  }
+  
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+  
+  buildScratchGrid();
+  buildProgressDots();
+  updateProgress();
+}
+
+function buildScratchGrid() {
+  const grid = document.getElementById('scratchGrid');
+  grid.innerHTML = '';
+  
+  const hintData = hints[selectedGender];
+  
+  for (let i = 0; i < 6; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'scratch-cell' + (i > 0 ? ' locked' : '');
+    cell.dataset.index = i;
+    cell.dataset.order = i;
+    
+    const hint = hintData[i];
+    
+    const content = document.createElement('div');
+    content.className = `scratch-content ${hint.bg}`;
+    content.innerHTML = `
+      <div class="scratch-emoji">${hint.emoji}</div>
+      <div class="scratch-text ${hint.textColor}">${hint.text}</div>
+    `;
+    
+    const cover = document.createElement('div');
+    cover.className = 'scratch-cover';
+    cover.innerHTML = `<span class="scratch-number">${i + 1}</span>`;
+    
+    cell.appendChild(content);
+    cell.appendChild(cover);
+    cell.addEventListener('click', () => handleScratch(cell, i));
+    grid.appendChild(cell);
+  }
+}
+
+function buildProgressDots() {
+  const dots = document.getElementById('progressDots');
+  dots.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    dot.id = `dot-${i}`;
+    dots.appendChild(dot);
+  }
+}
+
+function updateProgress() {
+  for (let i = 0; i < 6; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.className = 'progress-dot' + (i < currentStep ? ' filled' : '');
+  }
+  document.getElementById('progressText').textContent = progressMessages[currentStep];
+}
+
+function handleScratch(cell, index) {
+  if (isAnimating) return;
+  
+  if (index !== currentStep) {
+    cell.classList.add('shake');
+    setTimeout(() => cell.classList.remove('shake'), 400);
+    return;
+  }
+  
+  isAnimating = true;
+  
+  const cover = cell.querySelector('.scratch-cover');
+  cover.classList.add('scratching');
+  
+  setTimeout(() => {
+    cell.classList.add('revealed');
+    cell.classList.remove('locked');
+    currentStep++;
+    
+    if (currentStep < 6) {
+      const nextCell = document.querySelector(`.scratch-cell[data-order="${currentStep}"]`);
+      if (nextCell) nextCell.classList.remove('locked');
+    }
+    
+    updateProgress();
+    isAnimating = false;
+    
+    if (currentStep === 6) {
+      setTimeout(() => showFinalReveal(), 800);
+    }
+  }, 600);
+}
+
+function showFinalReveal() {
+  const overlay = document.getElementById('revealOverlay');
+  const bg = document.getElementById('revealBg');
+  const emoji = document.getElementById('revealEmoji');
+  const text = document.getElementById('revealText');
+  
+  if (selectedGender === 'boy') {
+    bg.className = 'reveal-bg boy-bg';
+    emoji.textContent = '👶💙';
+    text.textContent = "It's a BOY!";
+    text.className = 'reveal-text boy-text';
+  } else {
+    bg.className = 'reveal-bg girl-bg';
+    emoji.textContent = '👶💗';
+    text.textContent = "It's a GIRL!";
+    text.className = 'reveal-text girl-text';
+  }
+  
+  overlay.classList.add('show');
+  launchConfetti();
+  
+  if (navigator.vibrate) {
+    navigator.vibrate([100, 50, 100, 50, 200]);
+  }
+}
+
+// ===== ENHANCED CONFETTI =====
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  
+  const boyColors = ['#B5D8F7', '#87CEEB', '#4A90D9', '#E8F4FF', '#6BB3E0', '#A5CDE8', '#FFD700', '#FFF5BA', '#FFFFFF'];
+  const girlColors = ['#FFD1DC', '#FFB6C1', '#E8789A', '#FFF0F3', '#FF9EBF', '#F5A3C7', '#FFD700', '#FFF5BA', '#FFFFFF'];
+  const colors = selectedGender === 'boy' ? boyColors : girlColors;
+  
+  const emojis = selectedGender === 'boy' 
+    ? ['💙', '⭐', '🧸', '👶', '✨', '🎉', '💫']
+    : ['💗', '⭐', '🎀', '👶', '✨', '🎉', '💫'];
+  
+  // Wave 1: Initial burst from center
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      createConfettiPiece(container, colors, 'burst', emojis);
+    }, i * 15);
+  }
+  
+  // Wave 2: Rain from top
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      createConfettiPiece(container, colors, 'rain', emojis);
+    }, 300 + i * 25);
+  }
+  
+  // Wave 3: Swaying confetti
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      createConfettiPiece(container, colors, 'sway', emojis);
+    }, 1000 + i * 30);
+  }
+  
+  // Wave 4: Emoji shower
+  for (let i = 0; i < 25; i++) {
+    setTimeout(() => {
+      createEmojiConfetti(container, emojis);
+    }, 500 + i * 80);
+  }
+  
+  // Wave 5: Sparkle burst
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      createSparkle(container, colors);
+    }, 200 + i * 60);
+  }
+
+  // Continuous gentle rain for 6 seconds
+  let rainInterval = setInterval(() => {
+    for (let j = 0; j < 3; j++) {
+      createConfettiPiece(container, colors, 'rain', emojis);
+    }
+  }, 100);
+  
+  setTimeout(() => clearInterval(rainInterval), 6000);
+}
+
+function createConfettiPiece(container, colors, type, emojis) {
+  const el = document.createElement('div');
+  el.className = 'confetti';
+  
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const shapes = ['piece', 'streamer', 'circle'];
+  const shape = shapes[Math.floor(Math.random() * shapes.length)];
+  
+  el.style.left = Math.random() * 100 + '%';
+  
+  if (shape === 'piece') {
+    const w = Math.random() * 10 + 6;
+    const h = Math.random() * 10 + 6;
+    el.style.width = w + 'px';
+    el.style.height = h + 'px';
+    el.style.background = color;
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+  } else if (shape === 'streamer') {
+    el.style.width = (Math.random() * 4 + 6) + 'px';
+    el.style.height = (Math.random() * 16 + 18) + 'px';
+    el.style.background = color;
+    el.style.borderRadius = '4px';
+  } else {
+    const size = Math.random() * 8 + 8;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.background = color;
+    el.style.borderRadius = '50%';
+    el.style.boxShadow = `0 0 ${Math.random() * 6 + 2}px ${color}`;
+  }
+  
+  const duration = Math.random() * 2 + 2;
+  
+  if (type === 'burst') {
+    el.style.left = (40 + Math.random() * 20) + '%';
+    el.style.top = '40%';
+    el.style.animation = `confettiBurst ${duration + 1}s ease-out forwards`;
+  } else if (type === 'sway') {
+    el.style.animation = `confettiSway ${duration + 1.5}s ease-in-out forwards`;
+  } else {
+    el.style.animation = `confettiFall ${duration}s linear forwards`;
+  }
+  
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+function createEmojiConfetti(container, emojis) {
+  const el = document.createElement('div');
+  el.className = 'confetti';
+  el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  el.style.fontSize = (Math.random() * 14 + 14) + 'px';
+  el.style.left = Math.random() * 100 + '%';
+  el.style.animation = `confettiSway ${Math.random() * 2 + 3}s ease-in-out forwards`;
+  
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
+function createSparkle(container, colors) {
+  const el = document.createElement('div');
+  el.className = 'confetti';
+  el.textContent = '✦';
+  el.style.left = Math.random() * 100 + '%';
+  el.style.top = Math.random() * 80 + '%';
+  el.style.fontSize = (Math.random() * 12 + 10) + 'px';
+  el.style.color = colors[Math.floor(Math.random() * colors.length)];
+  el.style.animation = `sparkle ${Math.random() * 1 + 0.5}s ease-in-out ${Math.random() * 2}s 3, confettiFall ${Math.random() * 3 + 3}s linear forwards`;
+  el.style.textShadow = `0 0 8px ${el.style.color}`;
+  
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
+function resetGame() {
+  selectedGender = null;
+  currentStep = 0;
+  isAnimating = false;
+  
+  document.getElementById('revealOverlay').classList.remove('show');
+  document.getElementById('confettiContainer').innerHTML = '';
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'flex';
+  document.getElementById('btnBoy').className = 'gender-btn';
+  document.getElementById('btnGirl').className = 'gender-btn';
+}
+
+// Floating background items
+function createFloatingItems() {
+  const container = document.getElementById('floatingItems');
+  const items = ['🍼', '🧸', '⭐', '🌙', '🎀', '🧷', '🍭', '🌈', '☁️', '💫'];
+  
+  for (let i = 0; i < 12; i++) {
+    const item = document.createElement('div');
+    item.className = 'float-item';
+    item.textContent = items[Math.floor(Math.random() * items.length)];
+    item.style.left = Math.random() * 100 + '%';
+    item.style.animationDuration = (Math.random() * 15 + 15) + 's';
+    item.style.animationDelay = (Math.random() * 20) + 's';
+    item.style.fontSize = (Math.random() * 16 + 16) + 'px';
+    container.appendChild(item);
+  }
+}
+
+// Setup secret tap on title
+document.addEventListener('DOMContentLoaded', () => {
+  const title = document.querySelector('.setup-screen h1');
+  if (title) title.addEventListener('click', handleSecretTap);
+});
+
+createFloatingItems();
+</script>
+</body>
+</html>
